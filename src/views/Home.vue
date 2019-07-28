@@ -1,11 +1,11 @@
 <template>
 <!--	<HelloWorld /> -->
 	<div>
-		<v-toolbar flat color="white">
+		<v-toolbar dense color="white">
           <v-toolbar-title>{{ title }}</v-toolbar-title>
 		  <v-spacer/>
           <v-btn fab text small @click="prev">{{"<"}}</v-btn>
-          <v-btn outlined class="mr-2 ml-2" @click="setToday">本月</v-btn>
+          <v-btn outlined small class="mr-2 ml-2" @click="setToday">本月</v-btn>
           <v-btn fab text small @click="next">{{">"}}</v-btn>
 		</v-toolbar>
 		<v-sheet height="580">
@@ -32,7 +32,7 @@
 				</template>
 			</v-calendar>
 		</v-sheet>
-		<div style="width:50%;">
+		<div style="width:60%;">
 			<v-container grid-list-md text-center>
 				<v-layout wrap>
 					<v-flex xs3>
@@ -56,11 +56,11 @@
 				</v-layout>
 			</v-container>
 		</div>
-		<v-sheet height="60">
+		<div height="60">
 			<v-sheet color="red"/>
 			<v-sheet color="green"/>
 			<v-sheet color="blue"/>
-		</v-sheet>
+		</div>
 		<v-dialog persistent v-model="dialog" width="500">
 			<v-card>
 				<v-card-title>修改{{curdate}}</v-card-title>
@@ -128,7 +128,7 @@ export default {
 		trackedptz: {},
 		colorsptz: {
 			t: '#FF6464',
-			p: 'blue',
+			p: 'blue lighten-1',
 			z: '#90D090'
 		},
 		dialog: false,
@@ -163,6 +163,7 @@ export default {
 			this.fetchdata(start.date);
 		},
 		viewDay({date}) {
+			if (!this.$root.caleditable) return;
 			this.curdate = date;
 			if (this.trackedptz[this.curdate]) {
 				this.t0 = this.trackedptz[this.curdate].t[0];
