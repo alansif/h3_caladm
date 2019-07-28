@@ -31,12 +31,12 @@ export default {
 			this.dialog = true;
 		},
 		login() {
-			if (this.username === 'hs62623939') {
+			if (this.username === 'hs6262') {
 				this.dialog = false;
 				this.$root.caleditable = true;
 				localStorage.setItem('username', this.username);
 				this.$router.push('/home');
-			} else if (this.username === 'huasan3939') {
+			} else if (this.username === '3939') {
 				this.dialog = false;
 				localStorage.setItem('username', this.username);
 				this.$router.push('/home');
