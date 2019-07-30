@@ -235,6 +235,7 @@ export default {
 			this.dialogsch = false;
 		},
 		editsch(date,idx) {
+			if (!this.$root.caleditable) return;
 			const s = this.trackedptz[date];
 			if (!s || !s.events || !s.events[idx]) return;
 			this.editschindex = idx;
