@@ -232,7 +232,15 @@ export default {
 		deletesch() {
 			if (!this.trackedptz[this.curdate] || !this.trackedptz[this.curdate].events) return;
 			this.trackedptz[this.curdate].events.splice(this.editschindex, 1);
-			this.dialogsch = false;
+			this.$axios.post('/api/events', {
+				date: this.curdate,
+				events: this.trackedptz[this.curdate].events
+			}).then(response=>{
+			}).catch(error => {
+				console.dir(error);
+			}).finally(()=>{
+				this.dialogsch = false;
+			});
 		},
 		editsch(date,idx) {
 			if (!this.$root.caleditable) return;
