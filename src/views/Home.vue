@@ -68,9 +68,9 @@
 								left: idx * 55 + 'px',
 								backgroundColor: event.color
 							}"
-							class="my-event with-time"
+							class="my-event with-time text-center"
 							@click.stop="editsch(date,idx)"
-						></div>
+						>{{event.gender ? event.gender+event.product : ''}}</div>
 					</template>
 				</template>
 				
@@ -119,6 +119,8 @@
 								<v-flex>
 									<v-select :items="starttimes" label="开始时间" v-model="starttime" noDataText=""></v-select>
 									<v-select :items="durations" label="预计用时(分钟)" v-model="duration" noDataText=""></v-select>
+									<v-select :items="genders" label="性别" v-model="gender" noDataText=""></v-select>
+									<v-select :items="products" label="产品" v-model="product" noDataText=""></v-select>
 								</v-flex>
 							</v-layout>
 						</v-container>
@@ -222,8 +224,12 @@ export default {
 		curptz:0,
 		starttime:'',
 		duration:0,
+		gender:'',
+		product:'',
 		starttimes:["8:00","8:30","9:00","9:30","10:00","10:30","11:00","11:30","13:00","13:30","14:00","14:30","15:00","15:30","16:00","16:30"],
 		durations:[30,60,90,120],
+		genders:['男','女'],
+		products:['T','W','C']
 	}),
 	mounted() {
 		this.setToday();
@@ -251,16 +257,20 @@ export default {
 			this.curptz = {t:0,p:1,z:2}[es.ptz];
 			this.starttime = es.starttime;
 			this.duration = es.duration;
+			this.gender = es.gender;
+			this.product = es.product;
 			this.dialogsch = true;
 		},
 		savesch() {
-			if (this.starttime === '' || this.duration === 0) return;
+			if (this.starttime === '' || this.duration === 0 || this.gender === '' || this.product === '') return;
 			if (!this.curdate || !this.trackedptz[this.curdate]) return;
 			if (!this.trackedptz[this.curdate].events) this.trackedptz[this.curdate].events = [];
 			const e = {
 				ptz: ['t','p','z'][this.curptz],
 				starttime: this.starttime,
-				duration: this.duration
+				duration: this.duration,
+				gender: this.gender,
+				product: this.product
 			};
 			if (this.editschindex < 0) {
 				this.trackedptz[this.curdate].events.push(e);
