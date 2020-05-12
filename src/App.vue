@@ -35,6 +35,14 @@
 					<v-list-item-title>数据</v-list-item-title>
 				</v-list-item-content>
 			</v-list-item>
+			<v-list-item to="/logs">
+				<v-list-item-action>
+					<v-icon>history</v-icon>
+				</v-list-item-action>
+				<v-list-item-content>
+					<v-list-item-title>变更记录</v-list-item-title>
+				</v-list-item-content>
+			</v-list-item>
 		</v-list>
 	</v-navigation-drawer>
 	<v-app-bar app dense clipped-left dark color="amber darken-4">

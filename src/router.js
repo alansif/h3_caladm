@@ -28,6 +28,11 @@ const router = new Router({
 		path: '/table',
 		name: 'table',
 		component: () => import('./views/Table.vue')
+	},
+	{
+		path: '/logs',
+		name: 'logs',
+		component: () => import('./views/Logs.vue')
 	}
   ]
 });
