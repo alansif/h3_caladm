@@ -64,13 +64,13 @@
 							:style="{
 								top: timeToY(event.starttime) + 'px',
 								height: minutesToPixels(event.duration) + 'px',
-								width:'50px',
-								left: idx * 55 + 'px',
+								width:'100px',
+								left: idx * 105 + 'px',
 								backgroundColor: event.color
 							}"
 							class="my-event with-time text-center"
 							@click.stop="editsch(date,idx)"
-						>{{event.gender ? event.gender+event.product : ''}}</div>
+						>{{event.gender ? event.gender+'-'+event.product : ''}}</div>
 					</template>
 				</template>
 				
@@ -229,7 +229,7 @@ export default {
 		starttimes:["8:00","8:30","9:00","9:30","10:00","10:30","11:00","11:30","13:00","13:30","14:00","14:30","15:00","15:30","16:00","16:30"],
 		durations:[30,60,90,120],
 		genders:['男','女'],
-		products:['T','W','C']
+		products:['胃肠镜','胃镜','肠镜','无痛胃肠镜','无痛胃镜','无痛肠镜']
 	}),
 	mounted() {
 		this.setToday();
