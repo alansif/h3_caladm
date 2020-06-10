@@ -226,13 +226,20 @@ export default {
 		duration:0,
 		gender:'',
 		product:'',
-		starttimes:["8:00","8:30","9:00","9:30","10:00","10:30","11:00","11:30","12:00","12:30","13:00","13:30","14:00","14:30","15:00","15:30","16:00"],
-		durations:[30,60,90,120],
+		starttimes: [],
+		durations:[30,45,60,90,120],
 		genders:['男','女'],
 		products:['普通胃肠镜','普通胃镜','普通肠镜','无痛胃肠镜','无痛胃镜','无痛肠镜']
 	}),
 	mounted() {
 		this.setToday();
+		this.starttimes = [];
+		for(let i = 8; i < 17; ++i) {
+			this.starttimes.push(i + ':00');
+			this.starttimes.push(i + ':15');
+			this.starttimes.push(i + ':30');
+			this.starttimes.push(i + ':45');
+		}
 	},
 	methods: {
 		deletesch() {
