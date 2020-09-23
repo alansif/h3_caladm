@@ -80,22 +80,27 @@
 		<div style="width:60%;">
 			<v-container grid-list-md text-center>
 				<v-layout wrap>
-					<v-flex xs3>
+					<v-flex xs2>
 						图例
 					</v-flex>
-					<v-flex xs3>
+					<v-flex xs2>
 						<v-card dark :color="colorsptz.t">
 							<v-card-text class="pa-0">T日</v-card-text>
 						</v-card>
 					</v-flex>
-					<v-flex xs3>
+					<v-flex xs2>
 						<v-card dark :color="colorsptz.p">
 							<v-card-text class="pa-0">P日</v-card-text>
 						</v-card>
 					</v-flex>
-					<v-flex xs3>
+					<v-flex xs2>
 						<v-card dark :color="colorsptz.z">
 							<v-card-text class="pa-0">Z日</v-card-text>
+						</v-card>
+					</v-flex>
+					<v-flex xs2>
+						<v-card dark :color="colorsptz.h">
+							<v-card-text class="pa-0">H日</v-card-text>
 						</v-card>
 					</v-flex>
 				</v-layout>
@@ -112,6 +117,7 @@
 								<v-btn class="mx-2" active-class="red white--text" rounded>T日</v-btn>
 								<v-btn class="mx-2" active-class="blue white--text" rounded>P日</v-btn>
 								<v-btn class="mx-2" active-class="green white--text" rounded>Z日</v-btn>
+								<v-btn class="mx-2" active-class="purple white--text" rounded>H日</v-btn>
 							</v-flex>
 						</v-btn-toggle>
 						<v-container grid-list-xl>
@@ -177,6 +183,18 @@
 								<v-text-field label="可预约Z" v-model="z1" :rules="rNum"></v-text-field>
 							</v-flex>
 						</v-layout>
+						<v-layout>
+							<v-flex>
+								<v-text-field label="已预约H" v-model="h0" :rules="rNum"></v-text-field>
+							</v-flex>
+							<v-flex class="text-center">
+								<v-btn icon small @click.stop="()=>{if (h1>0) {--h1;++h0;}}"><v-icon>arrow_back</v-icon></v-btn>
+								<v-btn icon small @click.stop="()=>{if (h0>0) {--h0;++h1;}}"><v-icon>arrow_forward</v-icon></v-btn>
+							</v-flex>
+							<v-flex>
+								<v-text-field label="可预约H" v-model="h1" :rules="rNum"></v-text-field>
+							</v-flex>
+						</v-layout>
 					</v-container>
 					</v-form>
 				</v-card-text>
@@ -204,7 +222,8 @@ export default {
 		colorsptz: {
 			t: '#FF6464',
 			p: '#42A5F5',
-			z: '#90D090'
+			z: '#90D090',
+			h: '#EE82EE'
 		},
 		dialog: false,
 		curdate: '',
@@ -215,7 +234,9 @@ export default {
 		p1: 4,
 		z0: 5,
 		z1: 6,
-		rNum: [v => v.length === 0 || !isNaN(parseInt(v)) || '不是有效的数字'],
+		h0: 7,
+		h1: 8,
+		rNum: [v => !v || v.length === 0 || !isNaN(parseInt(v)) || '不是有效的数字'],
 		snackbar: false,
 		snackbarmsg: '',
 		snackbarcolor: 'success',
@@ -229,7 +250,7 @@ export default {
 		starttimes: [],
 		durations:[30,45,60,90,120],
 		genders:['男','女'],
-		products:['普通胃肠镜','普通胃镜','普通肠镜','无痛胃肠镜','无痛胃镜','无痛肠镜']
+		products:['普通胃肠镜','普通胃镜','普通肠镜','无痛胃肠镜','无痛胃镜','无痛肠镜','核酸']
 	}),
 	mounted() {
 		this.setToday();
@@ -261,7 +282,7 @@ export default {
 			if (!s || !s.events || !s.events[idx]) return;
 			this.editschindex = idx;
 			const es = s.events[idx];
-			this.curptz = {t:0,p:1,z:2}[es.ptz];
+			this.curptz = {t:0,p:1,z:2,h:3}[es.ptz];
 			this.starttime = es.starttime;
 			this.duration = es.duration;
 			this.gender = es.gender;
@@ -273,7 +294,7 @@ export default {
 			if (!this.curdate || !this.trackedptz[this.curdate]) return;
 			if (!this.trackedptz[this.curdate].events) this.trackedptz[this.curdate].events = [];
 			const e = {
-				ptz: ['t','p','z'][this.curptz],
+				ptz: ['t','p','z','h'][this.curptz],
 				starttime: this.starttime,
 				duration: this.duration,
 				gender: this.gender,
@@ -342,6 +363,8 @@ export default {
 				this.p1 = this.trackedptz[this.curdate].p[1];
 				this.z0 = this.trackedptz[this.curdate].z[0];
 				this.z1 = this.trackedptz[this.curdate].z[1];
+				this.h0 = this.trackedptz[this.curdate].h[0];
+				this.h1 = this.trackedptz[this.curdate].h[1];
 			} else {
 				this.t0 = '';
 				this.t1 = '';
@@ -349,11 +372,13 @@ export default {
 				this.p1 = '';
 				this.z0 = '';
 				this.z1 = '';
+				this.h0 = '';
+				this.h1 = '';
 			}
 			this.dialog = true;
 		},
 		saveform() {
-			if (this.t0+this.t1+this.p0+this.p1+this.z0+this.z1 === '') {
+			if (this.t0+this.t1+this.p0+this.p1+this.z0+this.z1+this.h0+this.h1 === '') {
 				this.dialog = false;
 				return;
 			}
@@ -363,6 +388,8 @@ export default {
 			this.p1 = this.p1 === '' ? 0 : parseInt(this.p1);
 			this.z0 = this.z0 === '' ? 0 : parseInt(this.z0);
 			this.z1 = this.z1 === '' ? 0 : parseInt(this.z1);
+			this.h0 = this.h0 === '' ? 0 : parseInt(this.h0);
+			this.h1 = this.h1 === '' ? 0 : parseInt(this.h1);
 			if (!this.$refs.form.validate()) {
 				return;
 			}
@@ -373,11 +400,13 @@ export default {
 					p0:		this.p0,
 					p1:		this.p1,
 					z0:		this.z0,
-					z1:		this.z1
+					z1:		this.z1,
+					h0:		this.h0,
+					h1:		this.h1
 				}).then(response=>{
 					this.snackbarcolor = 'success';
 					this.snackbarmsg = '保存成功';
-					this.trackedptz[this.curdate] = {p:[this.p0,this.p1],t:[this.t0,this.t1],z:[this.z0,this.z1]};
+					this.trackedptz[this.curdate] = {p:[this.p0,this.p1],t:[this.t0,this.t1],z:[this.z0,this.z1],h:[this.h0,this.h1]};
 				}).catch(error => {
 					console.dir(error);
 					this.snackbarcolor = 'error';
@@ -391,7 +420,7 @@ export default {
 			this.$axios.get('/api/data',{params:{date:startdate}})
 				.then(response=>{
 					let r = response.data.reduce((acc, cur)=>{
-						acc[cur.date]={p:[cur.p_used,cur.p_avl],t:[cur.t_used,cur.t_avl],z:[cur.z_used,cur.z_avl],events:JSON.parse(cur.events)};
+						acc[cur.date]={p:[cur.p_used,cur.p_avl],t:[cur.t_used,cur.t_avl],z:[cur.z_used,cur.z_avl],h:[cur.h_used,cur.h_avl],events:JSON.parse(cur.events)};
 						return acc;
 					}, {});
 					this.trackedptz = r;
@@ -401,12 +430,12 @@ export default {
 		},
 		getper(date, ptz) {
 			let v = this.trackedptz[date];
-			if (!v || !v[ptz] || (v[ptz][0] + v[ptz][1] === 0)) return undefined;
+			if (!v || !v[ptz] || v[ptz][0]===undefined || v[ptz][1]===undefined || (v[ptz][0] + v[ptz][1] === 0)) return undefined;
 			return 100 * v[ptz][0] / (v[ptz][0] + v[ptz][1]);
 		},
 		getstr(date, ptz) {
 			let v = this.trackedptz[date];
-			if (!v || !v[ptz]) return "";
+			if (!v || !v[ptz] || v[ptz][0]===undefined || v[ptz][1]===undefined) return "";
 			return v[ptz][0] + " / " + v[ptz][1];
 		},
 	},
