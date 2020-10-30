@@ -1,5 +1,4 @@
 <template>
-<!--	<HelloWorld /> -->
 	<div>
 		<v-toolbar dense color="white">
 			<v-toolbar-title>{{ title }}</v-toolbar-title>
@@ -9,7 +8,7 @@
 			<v-btn fab text small @click="next">{{">"}}</v-btn>
 		</v-toolbar>
 
-		<v-sheet height="580">
+		<v-sheet height="665">
 			<v-btn absolute dark fab left
 				v-if="caltype==='day' && $root.caleditable"
             	color="orange"
@@ -33,9 +32,9 @@
 				<template v-slot:day="{ present, past, date }">
 					<template v-if="trackedptz[date]">
 						<v-layout column fill-height>
-							<div v-for="(v,k) in colorsptz" style="height:17px">
+							<div v-for="(v,k) in colorsptz" :key="k" style="height:17px">
 								<v-progress-linear rounded height="17"
-									:color="v"
+									:color="v.color"
 									:value="getper(date, k)"
 									:active="getper(date, k) !== undefined"
 									@click="progClick(date)">
@@ -49,15 +48,6 @@
 				</template>
 				
 				<template v-slot:day-body="{ date, timeToY, minutesToPixels }">
-					<!-- <template v-for="(event,idx) in eventsMap2()[date]">
-						<div
-							v-if="event.time"
-							:key="idx"
-							:style="{ top: timeToY(event.time) + 'px', height: minutesToPixels(event.duration) + 'px', width:'50px', left: idx * 55 + 'px'}"
-							class="my-event with-time"
-							v-html="event.title"
-						></div>
-					-->
 						<template v-for="(event,idx) in getEvents(date)">
 						<div
 							:key="idx"
@@ -83,41 +73,27 @@
 					<v-flex xs2>
 						图例
 					</v-flex>
-					<v-flex xs2>
-						<v-card dark :color="colorsptz.t">
-							<v-card-text class="pa-0">T日</v-card-text>
-						</v-card>
-					</v-flex>
-					<v-flex xs2>
-						<v-card dark :color="colorsptz.p">
-							<v-card-text class="pa-0">P日</v-card-text>
-						</v-card>
-					</v-flex>
-					<v-flex xs2>
-						<v-card dark :color="colorsptz.z">
-							<v-card-text class="pa-0">Z日</v-card-text>
-						</v-card>
-					</v-flex>
-					<v-flex xs2>
-						<v-card dark :color="colorsptz.h">
-							<v-card-text class="pa-0">H日</v-card-text>
+					<v-flex xs2 v-for="c in colorsptz" :key="c.text">
+						<v-card dark :color="c.color">
+							<v-card-text class="pa-0">{{c.text}}</v-card-text>
 						</v-card>
 					</v-flex>
 				</v-layout>
 			</v-container>
 		</div>
 
-		<v-dialog persistent v-model="dialogsch" width="360">
+		<v-dialog persistent v-model="dialogsch" width="450">
 			<v-card>
 				<v-card-title>编辑{{curdate}}</v-card-title>
 				<v-card-text>
 					<v-form ref="formsch">
 						<v-btn-toggle mandatory v-model="curptz">
 							<v-flex>
-								<v-btn class="mx-2" active-class="red white--text" rounded>T日</v-btn>
-								<v-btn class="mx-2" active-class="blue white--text" rounded>P日</v-btn>
-								<v-btn class="mx-2" active-class="green white--text" rounded>Z日</v-btn>
-								<v-btn class="mx-2" active-class="purple white--text" rounded>H日</v-btn>
+								<v-btn value="t" class="mx-2" active-class="red white--text" rounded>T日</v-btn>
+								<v-btn value="p" class="mx-2" active-class="blue white--text" rounded>P日</v-btn>
+								<v-btn value="z" class="mx-2" active-class="green white--text" rounded>Z日</v-btn>
+								<v-btn value="h" class="mx-2" active-class="purple white--text" rounded>H日</v-btn>
+								<v-btn value="a" class="mx-2" active-class="amber white--text" rounded>A日</v-btn>
 							</v-flex>
 						</v-btn-toggle>
 						<v-container grid-list-xl>
@@ -147,52 +123,16 @@
 				<v-card-text>
 					<v-form ref="form">
 					<v-container grid-list-xl>
-						<v-layout>
+						<v-layout v-for="(a,i) in appointment.ptz" :key="i">
 							<v-flex>
-								<v-text-field label="已预约T" v-model="t0" :rules="rNum"></v-text-field>
+								<v-text-field :label="`已预约${labels[i]}`" v-model="a.used" :rules="rNum"></v-text-field>
 							</v-flex>
 							<v-flex class="text-center">
-								<v-btn icon small @click.stop="()=>{if (t1>0) {--t1;++t0;}}"><v-icon>arrow_back</v-icon></v-btn>
-								<v-btn icon small @click.stop="()=>{if (t0>0) {--t0;++t1;}}"><v-icon>arrow_forward</v-icon></v-btn>
+								<v-btn icon small @click.stop="()=>{if (a.avl>0) {--a.avl;++a.used;}}"><v-icon>arrow_back</v-icon></v-btn>
+								<v-btn icon small @click.stop="()=>{if (a.used>0) {--a.used;++a.avl;}}"><v-icon>arrow_forward</v-icon></v-btn>
 							</v-flex>
 							<v-flex>
-								<v-text-field label="可预约T" v-model="t1" :rules="rNum"></v-text-field>
-							</v-flex>
-						</v-layout>
-						<v-layout>
-							<v-flex>
-								<v-text-field label="已预约P" v-model="p0" :rules="rNum"></v-text-field>
-							</v-flex>
-							<v-flex class="text-center">
-								<v-btn icon small @click.stop="()=>{if (p1>0) {--p1;++p0;}}"><v-icon>arrow_back</v-icon></v-btn>
-								<v-btn icon small @click.stop="()=>{if (p0>0) {--p0;++p1;}}"><v-icon>arrow_forward</v-icon></v-btn>
-							</v-flex>
-							<v-flex>
-								<v-text-field label="可预约P" v-model="p1" :rules="rNum"></v-text-field>
-							</v-flex>
-						</v-layout>
-						<v-layout>
-							<v-flex>
-								<v-text-field label="已预约Z" v-model="z0" :rules="rNum"></v-text-field>
-							</v-flex>
-							<v-flex class="text-center">
-								<v-btn icon small @click.stop="()=>{if (z1>0) {--z1;++z0;}}"><v-icon>arrow_back</v-icon></v-btn>
-								<v-btn icon small @click.stop="()=>{if (z0>0) {--z0;++z1;}}"><v-icon>arrow_forward</v-icon></v-btn>
-							</v-flex>
-							<v-flex>
-								<v-text-field label="可预约Z" v-model="z1" :rules="rNum"></v-text-field>
-							</v-flex>
-						</v-layout>
-						<v-layout>
-							<v-flex>
-								<v-text-field label="已预约H" v-model="h0" :rules="rNum"></v-text-field>
-							</v-flex>
-							<v-flex class="text-center">
-								<v-btn icon small @click.stop="()=>{if (h1>0) {--h1;++h0;}}"><v-icon>arrow_back</v-icon></v-btn>
-								<v-btn icon small @click.stop="()=>{if (h0>0) {--h0;++h1;}}"><v-icon>arrow_forward</v-icon></v-btn>
-							</v-flex>
-							<v-flex>
-								<v-text-field label="可预约H" v-model="h1" :rules="rNum"></v-text-field>
+								<v-text-field :label="`可预约${labels[i]}`" v-model="a.avl" :rules="rNum"></v-text-field>
 							</v-flex>
 						</v-layout>
 					</v-container>
@@ -219,23 +159,21 @@ export default {
 		caltype: 'month',
 		focus: '',
 		trackedptz: {},
-		colorsptz: {
-			t: '#FF6464',
-			p: '#42A5F5',
-			z: '#90D090',
-			h: '#EE82EE'
-		},
+		colorsptz: [
+			{color:'#FF6464',text:'T日'},
+			{color:'#42A5F5',text:'P日'},
+			{color:'#90D090',text:'Z日'},
+			{color:'#EE82EE',text:'H日'},
+			{color:'#EEB266',text:'A日'},
+		],
 		dialog: false,
 		curdate: '',
 		title: '',
-		t0: 1,
-		t1: 2,
-		p0: 3,
-		p1: 4,
-		z0: 5,
-		z1: 6,
-		h0: 7,
-		h1: 8,
+		labels: ['T日','P日','Z日','H日','A日'],
+		appointment: {
+			ptz: (new Array(5)).fill({used:0, avl:0}),
+			events: null
+		},
 		rNum: [v => !v || v.length === 0 || !isNaN(parseInt(v)) || '不是有效的数字'],
 		snackbar: false,
 		snackbarmsg: '',
@@ -250,7 +188,7 @@ export default {
 		starttimes: [],
 		durations:[30,45,60,90,120],
 		genders:['男','女'],
-		products:['普通胃肠镜','普通胃镜','普通肠镜','无痛胃肠镜','无痛胃镜','无痛肠镜','核酸']
+		products:['普通胃肠镜','普通胃镜','普通肠镜','无痛胃肠镜','无痛胃镜','无痛肠镜','核酸','早癌']
 	}),
 	mounted() {
 		this.setToday();
@@ -270,8 +208,8 @@ export default {
 				date: this.curdate,
 				events: this.trackedptz[this.curdate].events
 			}).then(response=>{
-			}).catch(error => {
-				console.dir(error);
+			}).catch(err => {
+				console.error(err);
 			}).finally(()=>{
 				this.dialogsch = false;
 			});
@@ -282,7 +220,8 @@ export default {
 			if (!s || !s.events || !s.events[idx]) return;
 			this.editschindex = idx;
 			const es = s.events[idx];
-			this.curptz = {t:0,p:1,z:2,h:3}[es.ptz];
+//			this.curptz = {t:0,p:1,z:2,h:3,a:4}[es.ptz];
+			this.curptz = es.ptz;
 			this.starttime = es.starttime;
 			this.duration = es.duration;
 			this.gender = es.gender;
@@ -294,7 +233,8 @@ export default {
 			if (!this.curdate || !this.trackedptz[this.curdate]) return;
 			if (!this.trackedptz[this.curdate].events) this.trackedptz[this.curdate].events = [];
 			const e = {
-				ptz: ['t','p','z','h'][this.curptz],
+//				ptz: ['t','p','z','h','a'][this.curptz],
+				ptz: this.curptz,
 				starttime: this.starttime,
 				duration: this.duration,
 				gender: this.gender,
@@ -326,7 +266,11 @@ export default {
 			if (!this.trackedptz[date]) return [];
 			let schs = this.trackedptz[date].events;
 			if (!schs || schs.length === 0) return [];
-			const r = schs.map(v=>{ v.color = this.colorsptz[v.ptz]; return v;});
+			const r = schs.map(v=>{
+				const ptz = {t:0,p:1,z:2,h:3,a:4}[v.ptz];
+				v.color = this.colorsptz[ptz].color;
+				return v;
+			});
 			return r;
 		},
 		progClick(e) {
@@ -357,56 +301,48 @@ export default {
 			if (!this.$root.caleditable) return;
 			this.curdate = date;
 			if (this.trackedptz[this.curdate]) {
-				this.t0 = this.trackedptz[this.curdate].t[0];
-				this.t1 = this.trackedptz[this.curdate].t[1];
-				this.p0 = this.trackedptz[this.curdate].p[0];
-				this.p1 = this.trackedptz[this.curdate].p[1];
-				this.z0 = this.trackedptz[this.curdate].z[0];
-				this.z1 = this.trackedptz[this.curdate].z[1];
-				this.h0 = this.trackedptz[this.curdate].h[0];
-				this.h1 = this.trackedptz[this.curdate].h[1];
+				this.appointment = this.trackedptz[this.curdate];
 			} else {
-				this.t0 = '';
-				this.t1 = '';
-				this.p0 = '';
-				this.p1 = '';
-				this.z0 = '';
-				this.z1 = '';
-				this.h0 = '';
-				this.h1 = '';
+				this.appointment = {
+					ptz: [],
+					events: null
+				};
+				for (let i = 0; i < 5; ++i) {
+					this.appointment.ptz.push({used:0, avl:0});
+				}
 			}
 			this.dialog = true;
 		},
 		saveform() {
-			if (this.t0+this.t1+this.p0+this.p1+this.z0+this.z1+this.h0+this.h1 === '') {
+			const s = this.appointment.ptz.reduce((acc,cur) => acc + cur.used + cur.avl, '');
+			if (s === '') {
 				this.dialog = false;
 				return;
 			}
-			this.t0 = this.t0 === '' ? 0 : parseInt(this.t0);
-			this.t1 = this.t1 === '' ? 0 : parseInt(this.t1);
-			this.p0 = this.p0 === '' ? 0 : parseInt(this.p0);
-			this.p1 = this.p1 === '' ? 0 : parseInt(this.p1);
-			this.z0 = this.z0 === '' ? 0 : parseInt(this.z0);
-			this.z1 = this.z1 === '' ? 0 : parseInt(this.z1);
-			this.h0 = this.h0 === '' ? 0 : parseInt(this.h0);
-			this.h1 = this.h1 === '' ? 0 : parseInt(this.h1);
+			this.appointment.ptz.forEach(v => {
+				v.used = v.used === '' ? 0 : parseInt(v.used);
+				v.avl = v.avl === '' ? 0 : parseInt(v.avl);
+			});
 			if (!this.$refs.form.validate()) {
 				return;
 			}
+			const c = this.appointment.ptz;
 			this.$axios.post('/api/data', {
 					date:	this.curdate,
-					t0:		this.t0,
-					t1:		this.t1,
-					p0:		this.p0,
-					p1:		this.p1,
-					z0:		this.z0,
-					z1:		this.z1,
-					h0:		this.h0,
-					h1:		this.h1
+					t0:		c[0].used,
+					t1:		c[0].avl,
+					p0:		c[1].used,
+					p1:		c[1].avl,
+					z0:		c[2].used,
+					z1:		c[2].avl,
+					h0:		c[3].used,
+					h1:		c[3].avl,
+					a0:		c[4].used,
+					a1:		c[4].avl
 				}).then(response=>{
 					this.snackbarcolor = 'success';
 					this.snackbarmsg = '保存成功';
-					this.trackedptz[this.curdate] = {p:[this.p0,this.p1],t:[this.t0,this.t1],z:[this.z0,this.z1],h:[this.h0,this.h1]};
+					this.trackedptz[this.curdate] = this.appointment;
 				}).catch(error => {
 					console.dir(error);
 					this.snackbarcolor = 'error';
@@ -420,7 +356,16 @@ export default {
 			this.$axios.get('/api/data',{params:{date:startdate}})
 				.then(response=>{
 					let r = response.data.reduce((acc, cur)=>{
-						acc[cur.date]={p:[cur.p_used,cur.p_avl],t:[cur.t_used,cur.t_avl],z:[cur.z_used,cur.z_avl],h:[cur.h_used,cur.h_avl],events:JSON.parse(cur.events)};
+						acc[cur.date] = {
+							ptz: [
+								{used:cur.t_used, avl:cur.t_avl},
+								{used:cur.p_used, avl:cur.p_avl},
+								{used:cur.z_used, avl:cur.z_avl},
+								{used:cur.h_used, avl:cur.h_avl},
+								{used:cur.a_used, avl:cur.a_avl}
+							],
+							events: JSON.parse(cur.events)
+						};
 						return acc;
 					}, {});
 					this.trackedptz = r;
@@ -429,14 +374,14 @@ export default {
 				});
 		},
 		getper(date, ptz) {
-			let v = this.trackedptz[date];
-			if (!v || !v[ptz] || v[ptz][0]===undefined || v[ptz][1]===undefined || (v[ptz][0] + v[ptz][1] === 0)) return undefined;
-			return 100 * v[ptz][0] / (v[ptz][0] + v[ptz][1]);
+			let v = this.trackedptz[date].ptz;
+			if (!v || !v[ptz] || v[ptz].used===undefined || v[ptz].avl===undefined || (v[ptz].used + v[ptz].avl === 0)) return undefined;
+			return 100 * v[ptz].used / (v[ptz].used + v[ptz].avl);
 		},
 		getstr(date, ptz) {
-			let v = this.trackedptz[date];
-			if (!v || !v[ptz] || v[ptz][0]===undefined || v[ptz][1]===undefined) return "";
-			return v[ptz][0] + " / " + v[ptz][1];
+			let v = this.trackedptz[date].ptz;
+			if (!v || !v[ptz] || v[ptz].used===undefined || v[ptz].avl===undefined) return "";
+			return v[ptz].used + " / " + v[ptz].avl;
 		},
 	},
 	computed: {
