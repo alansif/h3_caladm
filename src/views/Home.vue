@@ -8,7 +8,7 @@
 			<v-btn fab text small @click="next">{{">"}}</v-btn>
 		</v-toolbar>
 
-		<v-sheet height="665">
+		<v-sheet height="795">
 			<v-btn absolute dark fab left
 				v-if="caltype==='day' && $root.caleditable"
             	color="orange"
