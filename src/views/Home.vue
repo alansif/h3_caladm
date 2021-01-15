@@ -92,7 +92,7 @@
 								<v-btn value="t" class="mx-2" active-class="red white--text" rounded>T日</v-btn>
 								<v-btn value="p" class="mx-2" active-class="blue white--text" rounded>P日</v-btn>
 								<v-btn value="z" class="mx-2" active-class="green white--text" rounded>Z日</v-btn>
-								<v-btn value="h" class="mx-2" active-class="purple white--text" rounded>H日</v-btn>
+								<v-btn value="h" class="mx-2" active-class="purple white--text" rounded>采血</v-btn>
 								<v-btn value="a" class="mx-2" active-class="amber white--text" rounded>A日</v-btn>
 							</v-flex>
 						</v-btn-toggle>
@@ -163,13 +163,13 @@ export default {
 			{color:'#FF6464',text:'T日'},
 			{color:'#42A5F5',text:'P日'},
 			{color:'#90D090',text:'Z日'},
-			{color:'#EE82EE',text:'H日'},
+			{color:'#EE82EE',text:'采血'},
 			{color:'#EEB266',text:'A日'},
 		],
 		dialog: false,
 		curdate: '',
 		title: '',
-		labels: ['T日','P日','Z日','H日','A日'],
+		labels: ['T日','P日','Z日','采血','A日'],
 		appointment: {
 			ptz: (new Array(5)).fill({used:0, avl:0}),
 			events: null
@@ -188,7 +188,7 @@ export default {
 		starttimes: [],
 		durations:[30,45,60,90,120],
 		genders:['男','女'],
-		products:['普通胃肠镜','普通胃镜','普通肠镜','无痛胃肠镜','无痛胃镜','无痛肠镜','核酸','早癌']
+		products:['普通胃肠镜','普通胃镜','普通肠镜','无痛胃肠镜','无痛胃镜','无痛肠镜','采血','早癌']
 	}),
 	mounted() {
 		this.setToday();
